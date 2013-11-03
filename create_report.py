@@ -4,16 +4,16 @@ import os, sys
 sshaddress = "git@github.com:gutechsoc-hackathon/"
 repos = set(("segfault", "geeksoc", "javatar", "Django", "sammo", "devnull", "EasternBlock", "TeamZero", "while1", "atlas", "Stefan",))
 
-extensions = set(("cpp", "php", "h", "hpp", "java", "py", "yml", "js", "html", "xml", "sql", "css"))
+extensions = set(("cpp", "php", "h", "c", "hpp", "hpp", "java", "py", "yml", "js", "html", "xml", "sql", "css"))
 
 def clone(address = sshaddress, repos = repos):
     for repo in repos:
-        subprocess.call("git clone " + sshaddress + repo, shell=True)
+        subprocess.call("cd .. && git clone " + sshaddress + repo, shell=True)
 
 def pull(address = sshaddress, repos = repos):
     for repo in repos:
         print repo
-        subprocess.call("cd " + repo + " && git fetch origin master && git reset --hard FETCH_HEAD", shell=True)
+        subprocess.call("cd ../" + repo + " && git fetch origin master && git reset --hard FETCH_HEAD", shell=True)
 
 def countlines(project, extension):
     if os.path.exists("tmp"):
@@ -38,10 +38,11 @@ def countlines(project, extension):
             return suma
 
 def printprojects(repos = repos, extensions = extensions):
-    if os.path.exists("report"):
-        os.remove("report")
-    with open("report", "w") as report:
+    if os.path.exists("report_tmp"):
+        os.remove("report_tmp")
+    with open("report_tmp", "w") as report:
         for repo in repos:
+            print repo
             first = True
             report.write("="*(30 - len(repo)/2) + " " + repo + " " + "="*(30 - len(repo)/2) + "\n")
             suma = 0
@@ -51,14 +52,20 @@ def printprojects(repos = repos, extensions = extensions):
                 if (count != 0):
                     report.write( extension + ":" + " " + str(count) + ", ")
             report.write("\ntotal: " + str(suma) + "\n")
-        return suma
+    os.rename("report_tmp", "report")
 
 #print countlines("javatar", "java")
 
 #print countlines("Django", "dupa")
 #pull()
+value = 0
+while True:
+    print value
+    pull()
+    printprojects()
+    process = subprocess.Popen("sleep 60", shell = True)
+    process.wait()
+    value += 1
 
-#pull()
-#printprojects()
 #pull()
 #subprocess.call("wc " + filelist.readlines()[0], shell = True)
